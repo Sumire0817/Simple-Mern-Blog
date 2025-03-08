@@ -1,10 +1,12 @@
-const express = require("express");
-const mongoose = require("mongoose");
 // Require Env file
 require("dotenv").config();
-const blogRoutes = require("./routes/blogRoutes"); // ✅ FIXED Import Path
-
+const express = require("express");
 const app = express();
+const mongoose = require("mongoose");
+const cors = require("cors");
+const blogRoutes = require("./routes/blogRoutes");
+
+app.use(cors());
 app.use(express.json());
 
 const port = process.env.PORT;
@@ -22,7 +24,7 @@ const connectDb = async () => {
 connectDb();
 
 // Use Routes
-app.use("/api/blog", blogRoutes); // ✅ FIXED Correct Route Usage
+app.use("/api/blog", blogRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}...`);

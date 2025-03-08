@@ -4,7 +4,7 @@ const Navbar = () => {
       <div className="container d-flex justify-content-end">
         <button
           className="btn btn-light"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          onClick={() => (window.location.href = "/")}
         >
           Home
         </button>

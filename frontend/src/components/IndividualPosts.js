@@ -9,6 +9,12 @@ const IndividualPosts = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // States for the update popup
+  const [showUpdatePopup, setShowUpdatePopup] = useState(false);
+  const [updatedTitle, setUpdatedTitle] = useState("");
+  const [updatedContent, setUpdatedContent] = useState("");
+  const [updateLoading, setUpdateLoading] = useState(false);
+
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -41,9 +47,37 @@ const IndividualPosts = () => {
     }
   };
 
+  // When update is clicked, prefill the update form and show the popup
   const handleUpdate = (e) => {
     e.stopPropagation(); // Prevents unwanted clicks
-    alert("Update feature coming soon!");
+    setUpdatedTitle(post.title);
+    setUpdatedContent(post.content);
+    setShowUpdatePopup(true);
+  };
+
+  // Handle updating the post using the popup data
+  const handleUpdatePost = async () => {
+    if (!updatedTitle.trim() || !updatedContent.trim()) {
+      alert("Title and content cannot be empty!");
+      return;
+    }
+
+    setUpdateLoading(true);
+
+    try {
+      const response = await axios.put(`http://localhost:5000/api/blog/${id}`, {
+        title: updatedTitle,
+        content: updatedContent,
+      });
+      alert("Post updated successfully.");
+      setPost(response.data); // Update the displayed post with new data
+      setShowUpdatePopup(false);
+    } catch (error) {
+      alert("Failed to update post. Try again later.");
+      console.error("Error updating post:", error);
+    } finally {
+      setUpdateLoading(false);
+    }
   };
 
   if (loading)
@@ -78,6 +112,51 @@ const IndividualPosts = () => {
           </button>
         </div>
       </div>
+
+      {/* Update Popup */}
+      {showUpdatePopup && (
+        <>
+          {/* Bootstrap Backdrop */}
+          <div
+            className="position-fixed top-0 start-0 w-100 h-100 bg-dark opacity-50 z-3"
+            onClick={() => setShowUpdatePopup(false)}
+          ></div>
+
+          <div
+            className="position-fixed top-50 start-50 translate-middle bg-light p-4 rounded shadow z-3"
+            style={{ width: "300px" }}
+          >
+            <h5 className="mb-3">Update Post</h5>
+            <input
+              type="text"
+              className="form-control mb-2"
+              placeholder="Title"
+              value={updatedTitle}
+              onChange={(e) => setUpdatedTitle(e.target.value)}
+            />
+            <textarea
+              className="form-control mb-2"
+              placeholder="Content"
+              rows="3"
+              value={updatedContent}
+              onChange={(e) => setUpdatedContent(e.target.value)}
+            ></textarea>
+            <button
+              className="btn btn-primary w-100"
+              onClick={handleUpdatePost}
+              disabled={updateLoading}
+            >
+              {updateLoading ? "Updating..." : "Update Post"}
+            </button>
+            <button
+              className="btn btn-secondary w-100 mt-2"
+              onClick={() => setShowUpdatePopup(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
